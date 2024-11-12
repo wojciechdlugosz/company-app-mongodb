@@ -2,9 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
-const employeesRoutes = require('./routes/employees.routes');
-const departmentsRoutes = require('./routes/departments.routes');
-const productsRoutes = require('./routes/products.routes');
+const employeesRoutes = require("./routes/employees.routes");
+const departmentsRoutes = require("./routes/departments.routes");
+const productsRoutes = require("./routes/products.routes");
 
 const app = express();
 
@@ -21,15 +21,23 @@ app.use((req, res) => {
 });
 
 // connects our backend code with the database
-mongoose.connect('mongodb://0.0.0.0:27017/companyDB', { useNewUrlParser: true });
+const NODE_ENV = process.env.NODE_ENV;
+let dbUri = '';
+
+if(NODE_ENV === 'production') dbUri = 'url to remote db';
+else if(NODE_ENV === 'test') dbUri = 'mongodb://0.0.0.0:27017/companyDBtest';
+else dbUri = 'mongodb://0.0.0.0:27017/companyDB';
+
+mongoose.connect(dbUri, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
 
 db.once('open', () => {
-  console.log('Connected to the database');
+  //console.log('Connected to the database');
 });
-
 db.on('error', err => console.log('Error ' + err));
 
-app.listen('8000', () => {
-  console.log('Server is running on port: 8000');
+const server = app.listen('8000', () => {
+  //console.log('Server is running on port: 8000');
 });
+
+module.exports = server;
